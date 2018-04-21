@@ -25,11 +25,14 @@ namespace ImageGallery.Client
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var authority = Configuration.GetValue<string>("AppSettings:Idp:Uri");
+            var useSsl = Configuration.GetValue<bool>("AppSettings:Idp:UseSsl");
+            
             // Add framework services.
             services.AddMvc();
 
@@ -57,8 +60,8 @@ namespace ImageGallery.Client
                     options.SignInScheme = "Cookies";
                     options.SaveTokens = true;
 
-                    options.Authority = "https://localhost:44332/";
-                    options.RequireHttpsMetadata = true;
+                    options.Authority = authority;
+                    options.RequireHttpsMetadata = useSsl;
 
                     options.ClientId = "ImageGallery-WebApp";
                     options.ClientSecret = "secret";
@@ -122,9 +125,7 @@ namespace ImageGallery.Client
 
         private static Task TransformClaims(TokenValidatedContext context)
         {
-            var identity = context.Principal.Identity as ClaimsIdentity;
-
-            if (identity != null)
+            if (context.Principal.Identity is ClaimsIdentity identity)
             {
                 var subjectClaim = identity.Claims.FirstOrDefault(_ => _.Type == JwtClaimTypes.Subject);
                 var claimsIdentity = new ClaimsIdentity(identity.AuthenticationType, JwtClaimTypes.GivenName,
@@ -138,15 +139,13 @@ namespace ImageGallery.Client
             return Task.CompletedTask;
         }
 
-
         // Used to set proper user claims
         private static Task SetUserInformationReceived(UserInformationReceivedContext context)
         {
             var claims = new List<Claim>();
             foreach (var jToken in context.User.Children())
             {
-                JToken roles;
-                if (context.User.TryGetValue(jToken.Path, value: out roles))
+                if (context.User.TryGetValue(jToken.Path, value: out var roles))
                 {
                     if (roles.Type != JTokenType.Array)
                         claims.Add(new Claim(roles.Path, roles.ToString()));

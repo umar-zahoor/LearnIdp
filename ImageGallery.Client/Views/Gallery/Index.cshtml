@@ -1,8 +1,10 @@
-﻿
+﻿@inject IConfiguration Configuration
+@using Microsoft.Extensions.Configuration
 @model ImageGallery.Client.ViewModels.GalleryIndexViewModel
 
 @{
     ViewBag.Title = "Home";
+    var apiUri = Configuration.GetValue<string>("AppSettings:Api:Uri");
 }
 
 <div class="bottomMarginDefault">
@@ -13,7 +15,7 @@
     {
         <div class="pull-left col-md-4">
             <div>
-                <img class="thumbnailImage" src="@("https://localhost:44391/images/" + item.FileName)" />
+                <img class="thumbnailImage" src="@($"{apiUri}images/" + item.FileName)" />
             </div>
             <div>
                 <div class="h5">@item.Title</div>

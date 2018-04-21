@@ -4,12 +4,20 @@ using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
 using IdentityServer4.Test;
+using Microsoft.Extensions.Configuration;
 
 namespace IdentityHost
 {
-    internal class TestConfig
+    internal class TestConfiguration
     {
-        internal static List<TestUser> GetTestUsers()
+        public TestConfiguration(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        private IConfiguration Configuration { get; }
+
+        internal List<TestUser> GetTestUsers()
         {
             return new List<TestUser>
             {
@@ -28,6 +36,7 @@ namespace IdentityHost
                         new Claim("subscription", "paiduser"),
                     }
                 },
+                
                 new TestUser
                 {
                     SubjectId = "b7539694-97e7-4dfe-84da-b4256e1ff5c7",
@@ -46,8 +55,11 @@ namespace IdentityHost
             };
         }
 
-        internal static IEnumerable<Client> GetClients()
+        internal IEnumerable<Client> GetClients()
         {
+            var clientUri = Configuration.GetValue<string>("AppSettings:Client:Uri");
+            var useSsl = Configuration.GetValue<bool>("AppSettings:Client:UseSsl");
+            
             return new List<Client>
             {
                 new Client
@@ -58,8 +70,8 @@ namespace IdentityHost
                     ClientSecrets = new List<Secret> {new Secret("secret".Sha256())},
 
                     AllowedGrantTypes = GrantTypes.Hybrid,
-                    RedirectUris = { "https://localhost:44328/signin-oidc" },
-                    PostLogoutRedirectUris = { "https://localhost:44328/signout-callback-oidc" },
+                    RedirectUris = { $"{clientUri}signin-oidc" },
+                    PostLogoutRedirectUris = { $"{clientUri}signout-callback-oidc" },
 
                     // Lifetime in seconds
                     // IdentityTokenLifetime = 300,
@@ -83,7 +95,7 @@ namespace IdentityHost
             };
         }
 
-        internal static IEnumerable<IdentityResource> GetIdentityResources()
+        internal IEnumerable<IdentityResource> GetIdentityResources()
         {
             return new List<IdentityResource>
             {
@@ -96,7 +108,7 @@ namespace IdentityHost
             };
         }
 
-        internal static IEnumerable<ApiResource> GetApiResources()
+        internal IEnumerable<ApiResource> GetApiResources()
         {
             return new List<ApiResource>
             {

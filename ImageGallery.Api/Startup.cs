@@ -20,11 +20,14 @@ namespace ImageGallery.Api
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var authority = Configuration.GetValue<string>("AppSettings:Idp:Uri");
+            var useSsl = Configuration.GetValue<bool>("AppSettings:Idp:UseSsl");
+            
             services.AddMvc();
 
             services.AddAuthorization(authzOptions =>
@@ -36,7 +39,6 @@ namespace ImageGallery.Api
                         policyBuilder.RequireAuthenticatedUser();
                         policyBuilder.AddRequirements(new MustOwnImageRequirement());
                     });
-
             });
 
             // register the DbContext on the container, getting the connection string from
@@ -57,14 +59,15 @@ namespace ImageGallery.Api
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = "https://localhost:44332/";
-                    options.RequireHttpsMetadata = true;
+                    options.Authority = $"{authority}";
+                    options.RequireHttpsMetadata = useSsl;
                     options.ApiName = "imagegallery-api";
                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, GalleryContext galleryContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
+            GalleryContext galleryContext)
         {
             loggerFactory.AddConsole();
 

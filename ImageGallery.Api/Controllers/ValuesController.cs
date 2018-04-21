@@ -1,19 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace ImageGallery.Api.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        private readonly IConfiguration _configuration;
+
+        public ValuesController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+        
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        [Authorize]
+        public async Task<JsonResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var discoveryClient = new DiscoveryClient(_configuration.GetValue<string>("AppSettings:Idp:Uri"));
+            var response = await discoveryClient.GetAsync();
+            
+            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            var userInfoClient = new UserInfoClient(response.UserInfoEndpoint);
+
+            var userInfoResponse = await userInfoClient.GetAsync(accessToken);
+            var claims = userInfoResponse.Claims;
+            
+            return new JsonResult(claims);
         }
 
         // GET api/values/5

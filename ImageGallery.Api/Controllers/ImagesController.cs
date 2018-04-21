@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 namespace ImageGallery.API.Controllers
 {
@@ -19,13 +21,15 @@ namespace ImageGallery.API.Controllers
         private readonly IGalleryRepository _galleryRepository;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMapper _mapper;
+        private IConfiguration _configuration;
 
         public ImagesController(IGalleryRepository galleryRepository,
-            IHostingEnvironment hostingEnvironment, IMapper mapper)
+            IHostingEnvironment hostingEnvironment, IMapper mapper, IConfiguration configuration)
         {
             _galleryRepository = galleryRepository;
             _hostingEnvironment = hostingEnvironment;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         [HttpGet()]
@@ -45,7 +49,7 @@ namespace ImageGallery.API.Controllers
 
         [HttpGet("{id}", Name = "GetImage")]
         [Authorize(Policy = "MustOwnImage")]
-        public IActionResult GetImage(Guid id)
+        public async Task<IActionResult> GetImage(Guid id)
         {
             //var ownerId = User.Claims?.FirstOrDefault(_ => _.Type == "sub")?.Value;
 
