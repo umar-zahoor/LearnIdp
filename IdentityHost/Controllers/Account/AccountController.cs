@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using IdentityHost.Entities;
 using IdentityHost.Services;
 using IdentityModel;
 using IdentityServer4.Events;
@@ -15,7 +16,6 @@ using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
-using IdentityServer4.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +30,7 @@ namespace IdentityHost.Controllers.Account
     [SecurityHeaders]
     public class AccountController : Controller
     {
-        private readonly TestUserStore _users;
+        //private readonly TestUserStore _users;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
@@ -198,7 +198,20 @@ namespace IdentityHost.Controllers.Account
                 // this might be where you might initiate a custom workflow for user registration
                 // in this sample we don't show how that would be done, as our sample implementation
                 // simply auto-provisions new external user
-                user = AutoProvisionUser(provider, providerUserId, claims);
+                //user = AutoProvisionUser(provider, providerUserId, claims);
+
+                var returnUrlAfterRegistration = Url.Action("ExternalLoginCallback",
+                    new {ReturnUrl = result.Properties.Items["returnUrl"]});
+
+                var continueWithUrl = Url.Action("RegisterUser", "UserRegistration",
+                    new
+                    {
+                        ReturnUrl = result.Properties.Items["returnUrl"],
+                        Provider = provider,
+                        ProviderUserId = providerUserId
+                    });
+
+                return Redirect(continueWithUrl);
             }
 
             // this allows us to collect any additonal claims or properties
@@ -457,7 +470,7 @@ namespace IdentityHost.Controllers.Account
             }
         }
 
-        private (TestUser user, string provider, string providerUserId, IEnumerable<Claim> claims)
+        private (User user, string provider, string providerUserId, IEnumerable<Claim> claims)
             FindUserFromExternalProvider(AuthenticateResult result)
         {
             var externalUser = result.Principal;
@@ -477,16 +490,16 @@ namespace IdentityHost.Controllers.Account
             var providerUserId = userIdClaim.Value;
 
             // find external user
-            var user = _users.FindByExternalProvider(provider, providerUserId);
+            var user = _userRepository.GetUserByProvider(provider, providerUserId);
 
             return (user, provider, providerUserId, claims);
         }
 
-        private TestUser AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
-        {
-            var user = _users.AutoProvisionUser(provider, providerUserId, claims.ToList());
-            return user;
-        }
+        //private TestUser AutoProvisionUser(string provider, string providerUserId, IEnumerable<Claim> claims)
+        //{
+        //    var user = _users.AutoProvisionUser(provider, providerUserId, claims.ToList());
+        //    return user;
+        //}
 
         private void ProcessLoginCallbackForOidc(AuthenticateResult externalResult, List<Claim> localClaims,
             AuthenticationProperties localSignInProps)

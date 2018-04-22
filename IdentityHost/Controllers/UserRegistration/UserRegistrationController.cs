@@ -24,9 +24,14 @@ namespace IdentityHost.Controllers.UserRegistration
 
 
         [HttpGet]
-        public IActionResult RegisterUser(string returnUrl)
+        public IActionResult RegisterUser(RegistrationInputModel registrationInputModel)
         {
-            var vm = new RegisterUserViewModel { ReturnUrl = returnUrl };
+            var vm = new RegisterUserViewModel
+            {
+                ReturnUrl = registrationInputModel.ReturnUrl,
+                Provider = registrationInputModel.Provider,
+                ProviderUserId = registrationInputModel.ProviderUserId
+            };
 
             return View(vm);
         }
@@ -54,14 +59,29 @@ namespace IdentityHost.Controllers.UserRegistration
                     }
                 };
 
+                if (model.IsProvisioningFromExternal)
+                {
+                    userToCreate.Logins.Add(new UserLogin
+                    {
+                        LoginProvider = model.Provider,
+                        ProviderKey = model.ProviderUserId,
+
+                    });
+                }
+
                 _userRepository.AddUser(userToCreate);
 
                 if (!_userRepository.Save())
                     throw new Exception("Creating a user failed.");
 
-                // Log in the newly created user
+                if (!model.IsProvisioningFromExternal)
+                {
+                    // Log in the newly created user
 
-                await HttpContext.SignInAsync(userToCreate.SubjectId, userToCreate.Username);
+                    await HttpContext.SignInAsync(userToCreate.SubjectId, userToCreate.Username);
+                }
+
+                
 
                 if (_interactionService.IsValidReturnUrl(model.ReturnUrl) || Url.IsLocalUrl(model.ReturnUrl))
                     return Redirect(model.ReturnUrl);
