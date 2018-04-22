@@ -1,4 +1,5 @@
 ﻿using IdentityHost.Entities;
+using IdentityHost.Extensions;
 using IdentityHost.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,7 @@ namespace IdentityHost
             Configuration = configuration;
         }
 
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -38,18 +39,21 @@ namespace IdentityHost
             services.AddDbContext<HostUserContext>(_ => _.UseSqlServer(connectionString));
 
             services.AddScoped<IHostUserRepository, HostUserRepository>();
-            
+
             services.AddMvc();
-            
+
             var testConfig = new TestConfiguration(Configuration);
 
             services.AddIdentityServer()
                 .AddDeveloperSigningCredential()
+                .AddHostUserStore()
                 .AddInMemoryClients(testConfig.GetClients())
                 .AddInMemoryIdentityResources(testConfig.GetIdentityResources())
                 .AddInMemoryApiResources(testConfig.GetApiResources())
-                .AddInMemoryPersistedGrants()
-                .AddTestUsers(testConfig.GetTestUsers());
+                .AddInMemoryPersistedGrants();
+
+            // Development code
+            //.AddTestUsers(testConfig.GetTestUsers());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,7 +66,7 @@ namespace IdentityHost
 
             hostUserContext.Database.Migrate();
             hostUserContext.EnsureSeedDataForContext();
-            
+
             app.UseIdentityServer();
 
             app.UseStaticFiles();
