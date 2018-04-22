@@ -14,6 +14,7 @@
   "profiles": {
     "IdentityHost": {
       "commandName": "IIS",
+      "commandLineArgs": "/seed",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
