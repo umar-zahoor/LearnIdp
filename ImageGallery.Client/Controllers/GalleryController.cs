@@ -15,7 +15,9 @@ using IdentityModel;
 using IdentityModel.Client;
 using ImageGallery.Client.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Remotion.Linq.Clauses.ResultOperators;
 
 namespace ImageGallery.Client.Controllers
 {
@@ -23,10 +25,12 @@ namespace ImageGallery.Client.Controllers
     public class GalleryController : Controller
     {
         private readonly IImageGalleryHttpClient _imageGalleryHttpClient;
+        private readonly IConfiguration _configuration;
 
-        public GalleryController(IImageGalleryHttpClient imageGalleryHttpClient)
+        public GalleryController(IImageGalleryHttpClient imageGalleryHttpClient, IConfiguration configuration)
         {
             _imageGalleryHttpClient = imageGalleryHttpClient;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> Index()
@@ -194,6 +198,34 @@ namespace ImageGallery.Client.Controllers
 
         public async Task Logout()
         {
+            var authority = _configuration.GetValue<string>("AppSettings:Idp:Uri");
+            
+            var discoveryClient = new DiscoveryClient(authority);
+            var discoverResponse = await discoveryClient.GetAsync();
+
+            var revocationClient =
+                new TokenRevocationClient(discoverResponse.RevocationEndpoint, "ImageGallery-WebApp", "secret");
+
+            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                var tokenRevocationResponse = await revocationClient.RevokeAccessTokenAsync(accessToken);
+                
+                if(tokenRevocationResponse.IsError)
+                    throw new Exception("Problem encountered while revoking the access token", tokenRevocationResponse.Exception);
+            }
+            
+            var refreshToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+            {
+                var tokenRevocationResponse = await revocationClient.RevokeRefreshTokenAsync(refreshToken);
+                
+                if(tokenRevocationResponse.IsError)
+                    throw new Exception("Problem encountered while revoking the refresh token", tokenRevocationResponse.Exception);
+            }
+
             await HttpContext.SignOutAsync("Cookies");
             await HttpContext.SignOutAsync("oidc");
         }
@@ -202,8 +234,9 @@ namespace ImageGallery.Client.Controllers
         [Authorize(Policy = "CanOrderFrame")]
         public async Task<IActionResult> OrderFrame()
         {
+            var idpUri = _configuration.GetValue<string>("AppSettings:Idp:Uri");
             var address = string.Empty;
-            var discoveryClient = new DiscoveryClient("https://localhost:44332/");
+            var discoveryClient = new DiscoveryClient(idpUri);
 
             var response = await discoveryClient.GetAsync();
 

@@ -83,6 +83,7 @@ namespace ImageGallery.Client
                     options.Scope.Add("imagegallery-api");
                     options.Scope.Add("subscription");
                     options.Scope.Add("country");
+                    options.Scope.Add("offline_access");
                 });
 
             // register an IHttpContextAccessor so we can access the current

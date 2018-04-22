@@ -62,6 +62,9 @@ namespace ImageGallery.Api
                     options.Authority = $"{authority}";
                     options.RequireHttpsMetadata = useSsl;
                     options.ApiName = "imagegallery-api";
+
+                    // For reference tokens and introspection endpoint
+                    options.ApiSecret = "apisecret";
                 });
         }
 

@@ -32,6 +32,7 @@ namespace IdentityHost
 
             return WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseIISIntegration()
                 .ConfigureLogging(cfg =>
                 {
                     cfg.ClearProviders();

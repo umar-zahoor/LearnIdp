@@ -58,7 +58,6 @@ namespace IdentityHost
         internal IEnumerable<Client> GetClients()
         {
             var clientUri = Configuration.GetValue<string>("AppSettings:Client:Uri");
-            var useSsl = Configuration.GetValue<bool>("AppSettings:Client:UseSsl");
             
             return new List<Client>
             {
@@ -68,6 +67,9 @@ namespace IdentityHost
 
                     ClientId = "ImageGallery-WebApp",
                     ClientSecrets = new List<Secret> {new Secret("secret".Sha256())},
+                    
+                    // For enabling refresh tokens
+                    AllowOfflineAccess = true,
 
                     AllowedGrantTypes = GrantTypes.Hybrid,
                     RedirectUris = { $"{clientUri}signin-oidc" },
@@ -83,14 +85,21 @@ namespace IdentityHost
                         IdentityServerConstants.StandardScopes.OpenId,
                         IdentityServerConstants.StandardScopes.Profile,
                         IdentityServerConstants.StandardScopes.Address,
+                        
                         "user-role",
                         "imagegallery-api",
                         "country",
                         "subscription",
+                        
+                        // For refresh tokens
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
                     },
 
                     // Use UserInfo end-point instead
                     //AlwaysIncludeUserClaimsInIdToken = true
+                    
+                    // For enabling reference tokens
+                    AccessTokenType = AccessTokenType.Reference
                 }
             };
         }
@@ -115,6 +124,11 @@ namespace IdentityHost
                 new ApiResource("imagegallery-api", "ImageGallery API",
                     // Include user claims in access token
                     new []{ "role" })
+                {
+                    // For using reference tokens, we have to enable introspection endpoint.
+                    // which requires an api secret
+                    ApiSecrets = { new Secret("apisecret".Sha256()) }
+                }
             };
         }
     }

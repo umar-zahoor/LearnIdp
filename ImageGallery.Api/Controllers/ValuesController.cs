@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -20,19 +21,22 @@ namespace ImageGallery.Api.Controllers
         
         // GET api/values
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<JsonResult> Get()
         {
-            var discoveryClient = new DiscoveryClient(_configuration.GetValue<string>("AppSettings:Idp:Uri"));
-            var response = await discoveryClient.GetAsync();
-            
-            var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
-            var userInfoClient = new UserInfoClient(response.UserInfoEndpoint);
+            //var discoveryClient = new DiscoveryClient(_configuration.GetValue<string>("AppSettings:Idp:Uri"));
+            //var response = await discoveryClient.GetAsync();
 
-            var userInfoResponse = await userInfoClient.GetAsync(accessToken);
-            var claims = userInfoResponse.Claims;
-            
-            return new JsonResult(claims);
+            //var accessToken = await HttpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            //var userInfoClient = new UserInfoClient(response.UserInfoEndpoint);
+
+            //var userInfoResponse = await userInfoClient.GetAsync(accessToken);
+            //var claims = userInfoResponse.Claims;
+
+            //return new JsonResult(claims);
+
+            return new JsonResult(new List<string> { "value1", "value2" });
+
         }
 
         // GET api/values/5
