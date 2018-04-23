@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
-namespace IdentityHost.Migrations.IdentityServer.PersistedGrantDb
+namespace IdentityHost.Migrations.PersistedGrantDb
 {
     [DbContext(typeof(PersistedGrantDbContext))]
-    [Migration("20180422154240_InitialIdentityServerPersistedGrantDbMigration")]
-    partial class InitialIdentityServerPersistedGrantDbMigration
+    [Migration("20180423042044_InitialGrantDbSchema")]
+    partial class InitialGrantDbSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

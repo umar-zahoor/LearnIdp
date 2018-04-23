@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
-namespace IdentityHost.Migrations
+namespace IdentityHost.Migrations.HostUserDb
 {
     [DbContext(typeof(HostUserContext))]
-    partial class HostUserContextModelSnapshot : ModelSnapshot
+    [Migration("20180423042335_'InitialUserDbSchema'")]
+    partial class InitialUserDbSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

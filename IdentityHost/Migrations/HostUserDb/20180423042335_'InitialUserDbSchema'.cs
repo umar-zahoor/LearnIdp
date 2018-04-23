@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace IdentityHost.Migrations
+namespace IdentityHost.Migrations.HostUserDb
 {
-    public partial class UserDbContext : Migration
+    public partial class InitialUserDbSchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
