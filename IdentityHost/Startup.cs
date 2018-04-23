@@ -49,7 +49,7 @@ namespace IdentityHost
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddIdentityServer()
+            services.AddIdentityServer(config => { config.Events.RaiseSuccessEvents = true; })
                 .AddDeveloperSigningCredential()
                 .AddHostUserStore()
 

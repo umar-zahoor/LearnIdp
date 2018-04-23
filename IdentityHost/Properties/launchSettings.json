@@ -14,12 +14,18 @@
   "profiles": {
     "IdentityHost": {
       "commandName": "IIS",
-      "commandLineArgs": "/seed",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:34306/"
+      "applicationUrl": "http://localhost:5000"
+    },
+    "ConsoleHost": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000"
     }
   }
 }

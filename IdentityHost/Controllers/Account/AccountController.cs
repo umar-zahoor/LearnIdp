@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using IdentityHost.Entities;
+using IdentityHost.Extensions;
 using IdentityHost.Services;
 using IdentityModel;
 using IdentityServer4.Events;
@@ -36,6 +37,7 @@ namespace IdentityHost.Controllers.Account
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
         private readonly IHostUserRepository _userRepository;
+        private readonly IServiceProvider _serviceProvider;
 
         public AccountController(
             IIdentityServerInteractionService interaction,
@@ -43,7 +45,8 @@ namespace IdentityHost.Controllers.Account
             IAuthenticationSchemeProvider schemeProvider,
             IEventService events,
             //TestUserStore users = null
-            IHostUserRepository userRepository
+            IHostUserRepository userRepository,
+            IServiceProvider serviceProvider
         )
         {
             // if the TestUserStore is not in DI, then we'll just use the global users collection
@@ -56,6 +59,7 @@ namespace IdentityHost.Controllers.Account
             _clientStore = clientStore;
             _schemeProvider = schemeProvider;
             _events = events;
+            _serviceProvider = serviceProvider;
         }
 
         /// <summary>
@@ -110,7 +114,12 @@ namespace IdentityHost.Controllers.Account
                 if (_userRepository.AreUserCredentialsValid(model.Username, model.Password))
                 {
                     var user = _userRepository.GetUserByUsername(model.Username);
+
+                    var request = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+
+
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.Username, user.SubjectId, user.Username));
+                    await _events.RaiseAsync(new SaveCoreTokenEvent(user.Username, user.SubjectId, user.Username, request.ClientId, _serviceProvider));
 
                     // only set explicit expiration here if user chooses "remember me". 
                     // otherwise we rely upon expiration configured in cookie middleware.
