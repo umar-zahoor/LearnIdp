@@ -13,7 +13,7 @@ namespace IdentityHost
     {
         public static void Main(string[] args)
         {
-            bool seed = false;
+            var seed = false;
 
             if (args != null && args.Any(_ => string.Equals(_, "/seed", StringComparison.InvariantCultureIgnoreCase)))
             {

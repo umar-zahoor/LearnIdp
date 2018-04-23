@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace ImageGallery.Api
 {
@@ -14,7 +9,22 @@ namespace ImageGallery.Api
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var seed = false;
+
+            if (args != null && args.Any(_ => string.Equals(_, "/seed", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                seed = true;
+                args = args.Except(new[] { "/seed" }).ToArray();
+            }
+
+            var webHost = BuildWebHost(args);
+
+            if (seed)
+            {
+                SeedData.EnsureSeedData(webHost.Services);
+            }
+
+            webHost.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

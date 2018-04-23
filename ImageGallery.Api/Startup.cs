@@ -78,19 +78,11 @@ namespace ImageGallery.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-
-            app.UseStaticFiles();
-
-            // ensure DB migrations are applied
-            galleryContext.Database.Migrate();
-
-            // seed the DB with data
-            galleryContext.EnsureSeedDataForContext();
-
+            }            
 
             app.UseAuthentication();
 
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }

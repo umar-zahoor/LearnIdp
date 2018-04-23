@@ -12,20 +12,13 @@
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "ImageGallery": {
+      "commandName": "IIS",
       "launchBrowser": true,
+      "launchUrl": "http://localhost/ImageGallery",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "ImageGallery.Client": {
-      "commandName": "IIS",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:34722/"
     }
   }
 }
