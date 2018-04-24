@@ -6,6 +6,7 @@ using IdentityServer4.Events;
 
 namespace IdentityHost.Extensions
 {
+    [Obsolete("Do not use", true)]
     public class SaveCoreTokenEvent : UserLoginSuccessEvent
     {
         private readonly string _clientId;

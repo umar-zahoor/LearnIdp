@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using IdentityHost.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace IdentityHost.Entities
+namespace IdentityHost.Contexts
 {
     public class HostUserContext : DbContext
     {

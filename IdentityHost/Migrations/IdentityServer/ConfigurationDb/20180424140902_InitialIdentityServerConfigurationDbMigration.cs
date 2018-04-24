@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 
-namespace IdentityHost.Migrations.ConfigurationDb
+namespace IdentityHost.Migrations.IdentityServer.ConfigurationDb
 {
-    public partial class InitialConfigurationDbSchema : Migration
+    public partial class InitialIdentityServerConfigurationDbMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

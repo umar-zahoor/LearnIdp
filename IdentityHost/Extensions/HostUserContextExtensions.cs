@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using IdentityHost.Contexts;
+using IdentityHost.Entities;
 using IdentityModel;
 
-namespace IdentityHost.Entities
+namespace IdentityHost.Extensions
 {
-    public static class IdentityHostContextExtensions
+    public static class HostUserContextExtensions
     {
         public static void EnsureSeedDataForContext(this HostUserContext context)
         {

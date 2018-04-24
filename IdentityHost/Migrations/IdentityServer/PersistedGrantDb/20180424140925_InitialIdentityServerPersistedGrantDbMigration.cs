@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace IdentityHost.Migrations.PersistedGrantDb
+namespace IdentityHost.Migrations.IdentityServer.PersistedGrantDb
 {
-    public partial class InitialGrantDbSchema : Migration
+    public partial class InitialIdentityServerPersistedGrantDbMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

@@ -119,7 +119,7 @@ namespace IdentityHost.Controllers.Account
 
 
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.Username, user.SubjectId, user.Username));
-                    await _events.RaiseAsync(new SaveCoreTokenEvent(user.Username, user.SubjectId, user.Username, request.ClientId, _serviceProvider));
+                    //await _events.RaiseAsync(new SaveCoreTokenEvent(user.Username, user.SubjectId, user.Username, request.ClientId, _serviceProvider));
 
                     // only set explicit expiration here if user chooses "remember me". 
                     // otherwise we rely upon expiration configured in cookie middleware.

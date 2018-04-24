@@ -1,5 +1,6 @@
 ﻿using System;
-using IdentityHost.Entities;
+using IdentityHost.Contexts;
+using IdentityHost.Extensions;
 using IdentityServer4.EntityFramework.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,10 @@ namespace IdentityHost
                 var persistedGrantDbContext = scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>();
 
                 persistedGrantDbContext.Database.Migrate();
+
+                var coreApiMappingDbContext = scope.ServiceProvider.GetRequiredService<CoreApiMappingDbContext>();
+
+                coreApiMappingDbContext.Database.Migrate();
             }
         }
 

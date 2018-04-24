@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using IdentityHost.Contexts;
 using IdentityHost.Entities;
 using IdentityHost.Extensions;
 using IdentityHost.Services;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -38,18 +40,27 @@ namespace IdentityHost
         {
             var userDataConnectionString = Configuration.GetConnectionString("UserAccountConnection");
             var identityDataConnectionString = Configuration.GetConnectionString("IdentityDbConnection");
-            services.AddDbContext<HostUserContext>(_ => _.UseSqlServer(userDataConnectionString));
 
+            services.AddDbContext<CoreApiMappingDbContext>(_ => _.UseSqlServer(identityDataConnectionString));
+            services.AddDbContext<HostUserContext>(_ => _.UseSqlServer(userDataConnectionString));
             services.AddScoped<IHostUserRepository, HostUserRepository>();
+
+
             services.AddTransient<TestConfiguration>();
 
             services.AddMvc();
+
+            services.AddScoped<IEventService, CustomEventService>();
 
             //var testConfig = new TestConfiguration(Configuration);
 
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddIdentityServer(config => { config.Events.RaiseSuccessEvents = true; })
+            services.AddIdentityServer(config =>
+                {
+                    // Raise only success events, by default no event types are raised.
+                    config.Events.RaiseSuccessEvents = true;
+                })
                 .AddDeveloperSigningCredential()
                 .AddHostUserStore()
 

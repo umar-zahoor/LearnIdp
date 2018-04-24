@@ -4,7 +4,7 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityHost.Entities
+namespace IdentityHost.Extensions
 {
     public static class ConfigurationDbContextExtensions
     {
